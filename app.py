@@ -18,11 +18,20 @@ def collect():
             timeout=120
         )
         if result.returncode == 0:
-            return jsonify({"status": "success", "message": "Snapshot collected"})
+            return jsonify({
+                "status": "success",
+                "message": "Snapshot collected successfully"
+            }), 200
         else:
-            return jsonify({"status": "error", "error": result.stderr}), 500
+            return jsonify({
+                "status": "error",
+                "message": "Collector failed"
+            }), 500
     except Exception as e:
-        return jsonify({"status": "error", "message": str(e)}), 500
+        return jsonify({
+            "status": "error",
+            "message": str(e)
+        }), 500
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 10000))
