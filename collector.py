@@ -1,6 +1,7 @@
 import json
 import urllib.request
 import urllib.parse
+import urllib.error
 import base64
 import os
 
@@ -61,7 +62,7 @@ def upload_to_github(local_file, github_path):
     print("GitHub path:", github_path)
 
     # --------------------------------------------------------
-    # Read local file
+    # Read snapshot file
     # --------------------------------------------------------
 
     with open(
@@ -88,7 +89,7 @@ def upload_to_github(local_file, github_path):
     )
 
     # --------------------------------------------------------
-    # Prepare request
+    # GitHub request
     # --------------------------------------------------------
 
     payload = {
@@ -113,7 +114,7 @@ def upload_to_github(local_file, github_path):
     )
 
     # --------------------------------------------------------
-    # Send to GitHub
+    # Send request
     # --------------------------------------------------------
 
     try:
@@ -128,9 +129,16 @@ def upload_to_github(local_file, github_path):
             )
 
         print("GitHub upload successful.")
+
         print(
             "Commit:",
-            response_data.get("commit", {}).get("sha", "unknown")
+            response_data.get(
+                "commit",
+                {}
+            ).get(
+                "sha",
+                "unknown"
+            )
         )
 
         return True
@@ -160,14 +168,20 @@ def main():
     print("=" * 70)
     print("CRYPTO GEX SNAPSHOT")
     print("=" * 70)
-    print("UTC:", captured_at.isoformat())
+
+    print(
+        "UTC:",
+        captured_at.isoformat()
+    )
 
 
     # ========================================================
-    # 1. GET ACTIVE USDC OPTIONS
+    # 1. GET ACTIVE USDC OPTION INSTRUMENTS
     # ========================================================
 
-    print("\nDownloading instrument metadata...")
+    print(
+        "\nDownloading instrument metadata..."
+    )
 
     instruments_response = get_json(
         "get_instruments",
@@ -192,10 +206,12 @@ def main():
 
 
     # ========================================================
-    # 2. GET CURRENT OPTION BOOK SUMMARIES
+    # 2. GET OPTION BOOK SUMMARIES
     # ========================================================
 
-    print("Downloading option summaries...")
+    print(
+        "Downloading option summaries..."
+    )
 
     summary_response = get_json(
         "get_book_summary_by_currency",
@@ -214,7 +230,7 @@ def main():
 
 
     # ========================================================
-    # 3. KEEP OUR FIVE ASSETS
+    # 3. KEEP ONLY OUR FIVE ASSETS
     # ========================================================
 
     prefixes = tuple(
@@ -260,7 +276,9 @@ def main():
                 instrument_name,
 
             "strike":
-                metadata.get("strike"),
+                metadata.get(
+                    "strike"
+                ),
 
             "option_type":
                 option_type,
@@ -329,7 +347,7 @@ def main():
 
 
     # ========================================================
-    # 5. STATISTICS
+    # 5. COUNT OPTIONS PER ASSET
     # ========================================================
 
     asset_counts = {}
@@ -385,7 +403,7 @@ def main():
 
 
     # ========================================================
-    # 7. SAVE SNAPSHOT LOCALLY
+    # 7. SAVE SNAPSHOT
     # ========================================================
 
     date_folder = captured_at.strftime(
@@ -424,12 +442,15 @@ def main():
             indent=2
         )
 
-    print("\nSaved locally:")
+    print(
+        "\nSaved locally:"
+    )
+
     print(output_file)
 
 
     # ========================================================
-    # 8. UPLOAD TO GITHUB
+    # 8. UPLOAD SNAPSHOT TO GITHUB
     # ========================================================
 
     github_path = (
@@ -448,8 +469,12 @@ def main():
     # 9. FINISHED
     # ========================================================
 
-    print("\nSNAPSHOT SUCCESSFULLY COLLECTED")
-    print("AND UPLOADED TO GITHUB")
+    print(
+        "\nSNAPSHOT SUCCESSFULLY "
+        "COLLECTED AND UPLOADED "
+        "TO GITHUB"
+    )
+
     print("=" * 70)
 
 
